@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "src/",
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "module": "esnext",
@@ -9,5 +10,6 @@
     "noFallthroughCasesInSwitch": true,
     "strict": true,
     "target": "es2022"
-  }
+  },
+  "include": ["src"]
 }
