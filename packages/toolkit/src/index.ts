@@ -1,1 +1,1 @@
-module.exports = {};
+export { incrementVersion } from "./VersionFormat";
