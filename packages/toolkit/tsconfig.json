@@ -1,6 +1,13 @@
 {
   "compilerOptions": {
+    "baseUrl": "src/",
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "es2015"
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "strict": true,
+    "target": "es2022"
   }
 }
