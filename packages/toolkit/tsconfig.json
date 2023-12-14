@@ -8,8 +8,12 @@
     "moduleResolution": "node",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
     "strict": true,
     "target": "es2022"
   },
-  "include": ["src"]
+  "include": [
+     "jest.config.ts",
+     "src"
+   ]
 }
