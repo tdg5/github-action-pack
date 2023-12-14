@@ -3,6 +3,7 @@
   "description": "Toolkit of various GitHub action utilities",
   "devDependencies": {
     "@types/jest": "^29.5.11",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.0",
@@ -20,12 +21,13 @@
   "files": [
     "src"
   ],
+  "main": "src/index.ts",
+  "name": "github-action-pack-toolkit",
+  "scope": "tdg5",
   "scripts": {
     "lint": "tsc --noEmit && eslint --fix src/**/*.ts",
     "test": "jest",
     "test-watch": "jest --watch"
   },
-  "main": "src/index.ts",
-  "name": "github-action-pack-toolkit",
   "version": "0.0.1"
 }

@@ -5,5 +5,9 @@
     "nx": "^17.2.0"
   },
   "main": "index.js",
-  "name": "github-action-pack-top-level"
+  "name": "github-action-pack-top-level",
+  "scope": "tdg5",
+  "workspaces": [
+    "packages/toolkit"
+  ]
 }
