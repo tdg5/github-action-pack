@@ -1,19 +1,7 @@
 {
   "compilerOptions": {
-    "baseUrl": "src/",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "strict": true,
-    "target": "es2022"
+    "baseUrl": "src/"
   },
-  "include": [
-     "jest.config.ts",
-     "src"
-   ]
+  "extends": "../../tsconfig.json",
+  "include": ["jest.config.ts", "src"]
 }
