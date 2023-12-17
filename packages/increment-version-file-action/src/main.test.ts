@@ -6,7 +6,7 @@ import { jest } from "@jest/globals";
 import { incrementVersion } from "github-action-pack-toolkit";
 import { makeTempRepo } from "github-action-pack-test-toolkit";
 
-import { main } from "./action";
+import { main } from "./main";
 import { incrementVersionFile } from "./incrementVersionFile";
 
 describe("main", () => {
