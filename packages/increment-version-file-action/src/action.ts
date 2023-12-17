@@ -48,6 +48,10 @@ export async function main({
     const git = simpleGit(repoPath);
     await git.add(versionFilePathFull);
     await git.commit(commitMessage, { "--author": `${authorName} <${authorEmail}>` });
+    const remotes = await git.getRemotes();
+    if (remotes.length > 0) {
+      await git.push();
+    }
   } catch (error: any) {
     setFailed(error.message);
     throw error;
