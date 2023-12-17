@@ -1,7 +1,5 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "packages": [
-    "packages/increment-version-file-action"
-  ],
-  "version": "0.0.1"
+  "packages": ["packages/increment-version-file-action"],
+  "version": "0.0.2"
 }
