@@ -98,11 +98,11 @@ interface IncrementVersionArgs {
   version: string;
 }
 
-export function incrementVersion({
+export const incrementVersion = ({
   format,
   version,
-}: IncrementVersionArgs): string {
+}: IncrementVersionArgs): string => {
   const theFormat = format in FORMAT_CONFIGURATIONS ? format : "default";
   const versionFormat = new VersionFormat(FORMAT_CONFIGURATIONS[theFormat]);
   return versionFormat.incrementVersion(version);
-}
+};

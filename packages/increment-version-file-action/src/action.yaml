@@ -1,0 +1,25 @@
+author: dannyguinther@gmail.com
+description: Increment various kinds of version files and commit those changes.
+inputs:
+  authorEmail:
+    description: The author email that should be used by git when commtting the change to the version file.
+    required: true
+  authorName:
+    description: The author name that should be used by git when commtting the change to the version file.
+    required: true
+  commitMessage:
+    description: The commit message to use when commiting the change to the version file.
+    required: true
+  repoPath:
+    description: The path to the repository with the version file.
+    required: true
+  versionFilePath:
+    description: The relative path to the version file.
+    required: true
+  versionFormat:
+    description: The format to use when handling the version file.
+    required: true
+name: Increment Version File
+runs:
+  main: ../dist/index.js
+  using: node16
