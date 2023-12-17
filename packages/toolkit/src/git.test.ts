@@ -1,9 +1,6 @@
 import { promises as fs } from "fs";
 import * as path from "path";
 
-import { simpleGit, SimpleGit } from "simple-git";
-import * as tmp from "tmp-promise";
-
 import { makeTempRepo } from "github-action-pack-test-toolkit";
 import { stageFiles } from "./git";
 

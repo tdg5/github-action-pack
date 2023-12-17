@@ -1,13 +1,10 @@
 import { promises as fs } from "fs";
 import * as path from "path";
 
-import { jest } from "@jest/globals";
-
 import { incrementVersion } from "github-action-pack-toolkit";
 import { makeTempRepo } from "github-action-pack-test-toolkit";
 
 import { main } from "./main";
-import { incrementVersionFile } from "./incrementVersionFile";
 
 describe("main", () => {
   test("basic invocation", async () => {
@@ -19,7 +16,7 @@ describe("main", () => {
     const versionFormat = "default";
     const { disposeCallback, git, repoPath } = await makeTempRepo();
     try {
-      const versionFilePathFull = path.join(repoPath, versionFilePath)
+      const versionFilePathFull = path.join(repoPath, versionFilePath);
       await fs.writeFile(versionFilePathFull, initialVersion);
 
       await main({
@@ -40,17 +37,18 @@ describe("main", () => {
       });
 
       const newVersion = await fs.readFile(versionFilePathFull, "utf-8");
-      expect(newVersion).toBe(incrementVersion({
-        format: versionFormat,
-        version: initialVersion,
-      }));
+      expect(newVersion).toBe(
+        incrementVersion({
+          format: versionFormat,
+          version: initialVersion,
+        }),
+      );
 
-      const lastCommit = (await git.log({maxCount: 1 })).latest!;
+      const lastCommit = (await git.log({ maxCount: 1 })).latest!;
       expect(lastCommit.message).toEqual(commitMessage);
-      expect(lastCommit.author_email).toEqual(authorEmail)
-      expect(lastCommit.author_name).toEqual(authorName)
-    }
-    finally {
+      expect(lastCommit.author_email).toEqual(authorEmail);
+      expect(lastCommit.author_name).toEqual(authorName);
+    } finally {
       disposeCallback();
     }
   });
