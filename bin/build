@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e -o pipefail
+
+get_repo_dir () {
+  SOURCE="${BASH_SOURCE[0]}"
+  # While $SOURCE is a symlink, resolve it
+  while [ -h "$SOURCE" ]; do
+       DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+       SOURCE="$( readlink "$SOURCE" )"
+       # If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve
+       # it relative to the symlink base directory
+       [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  done
+  DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
+  echo "$DIR"
+}
+
+REPO_DIR="$(get_repo_dir)"
+
+PACKAGE_PATHS="$(find $REPO_DIR -name '*-action' -type d -not -wholename '*/node_modules/*')"
+for PACKAGE_PATH in $PACKAGE_PATHS; do
+  echo "Building package ${PACKAGE_PATH}..."
+  ACTION_PATHS="$(find "$PACKAGE_PATH" -type f -name 'action.ts' -not -wholename '*/node_modules/*')"
+  for ACTION_PATH in $ACTION_PATHS; do
+    echo "Building action ${ACTION_PATH}..."
+    npx ncc build -m "$ACTION_PATH" -o "$PACKAGE_PATH/dist"
+  done
+done
