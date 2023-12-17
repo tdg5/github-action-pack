@@ -2,7 +2,8 @@
   "devDependencies": {
     "@vercel/ncc": "^0.38.1",
     "lerna": "^7.4.2",
-    "nx": "^17.2.0"
+    "nx": "^17.2.0",
+    "tmp-promise": "^3.0.3"
   },
   "main": "index.js",
   "name": "github-action-pack-top-level",

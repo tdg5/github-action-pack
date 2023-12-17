@@ -1,5 +1,8 @@
 {
   "author": "dannyguinther@gmail.com",
+  "dependencies": {
+    "simple-git": "^3.21.0"
+  },
   "description": "Toolkit of various GitHub action utilities",
   "devDependencies": {
     "@types/jest": "^29.5.11",
