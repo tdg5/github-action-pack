@@ -1,6 +1,5 @@
 {
   "author": "dannyguinther@gmail.com",
-  "dependencies": {},
   "description": "Toolkit of various utilities for testing github-action-pack",
   "directories": {
     "src": "src"
@@ -16,5 +15,5 @@
     "test": "jest",
     "test-watch": "jest --watch"
   },
-  "version": "0.0.1"
+  "version": "0.0.3"
 }

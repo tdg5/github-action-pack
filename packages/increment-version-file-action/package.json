@@ -19,5 +19,5 @@
   "main": "src/action.ts",
   "name": "github-action-pack-increment-version-file-action",
   "scope": "tdg5",
-  "version": "0.0.2"
+  "version": "0.0.3"
 }
