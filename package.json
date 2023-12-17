@@ -8,6 +8,7 @@
   "name": "github-action-pack-top-level",
   "scope": "tdg5",
   "workspaces": [
+    "packages/test-toolkit",
     "packages/toolkit"
   ]
 }
