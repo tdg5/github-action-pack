@@ -11,9 +11,7 @@
   "name": "github-action-pack-test-toolkit",
   "scope": "tdg5",
   "scripts": {
-    "lint": "tsc --noEmit && eslint --fix src/**/*.ts",
-    "test": "jest",
-    "test-watch": "jest --watch"
+    "lint": "tsc --noEmit && eslint --fix src/**/*.ts"
   },
   "version": "0.0.3"
 }

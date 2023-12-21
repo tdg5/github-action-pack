@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import * as path from "path";
 
 import { incrementVersion } from "github-action-pack-toolkit";
-import { makeTempRepo } from "github-action-pack-test-toolkit";
+import { makeTempRepoWithRemote } from "github-action-pack-test-toolkit";
 
 import { main } from "./main";
 
@@ -14,8 +14,17 @@ describe("main", () => {
     const authorName = "authorName";
     const versionFilePath = "versionFilePath";
     const versionFormat = "default";
-    const { disposeCallback, git, repoPath } = await makeTempRepo();
+    const { disposeCallback, remoteGit, repoPath } =
+      await makeTempRepoWithRemote();
     try {
+      const remoteInitialLog = (await remoteGit.log({ maxCount: 1 })).latest;
+      if (remoteInitialLog === null) {
+        throw Error("Failed to initialize remote repo");
+      }
+      const initialRef = (await remoteGit.status()).current;
+      // Detach HEAD, because we can't push to a branch that is checked out
+      await remoteGit.checkout({ "--detach": null });
+
       const versionFilePathFull = path.join(repoPath, versionFilePath);
       await fs.writeFile(versionFilePathFull, initialVersion);
 
@@ -44,10 +53,16 @@ describe("main", () => {
         }),
       );
 
-      const lastCommit = (await git.log({ maxCount: 1 })).latest!;
-      expect(lastCommit.message).toEqual(commitMessage);
-      expect(lastCommit.author_email).toEqual(authorEmail);
-      expect(lastCommit.author_name).toEqual(authorName);
+      const remoteFinalLog = (
+        await remoteGit.log({ from: initialRef, maxCount: 1 })
+      ).latest;
+      if (remoteFinalLog === null) {
+        throw Error("Failed to fetch log from remote repo");
+      }
+      expect(remoteFinalLog.hash).not.toEqual(remoteInitialLog.hash);
+      expect(remoteFinalLog.author_email).toEqual(authorEmail);
+      expect(remoteFinalLog.author_name).toEqual(authorName);
+      expect(remoteFinalLog.message).toEqual(commitMessage);
     } finally {
       disposeCallback();
     }
