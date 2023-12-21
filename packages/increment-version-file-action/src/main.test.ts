@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import * as path from "path";
 
 import { incrementVersion } from "github-action-pack-toolkit";
-import { makeTempRepo } from "github-action-pack-test-toolkit";
+import { makeTempRepoWithRemote } from "github-action-pack-test-toolkit";
 
 import { main } from "./main";
 
@@ -14,7 +14,13 @@ describe("main", () => {
     const authorName = "authorName";
     const versionFilePath = "versionFilePath";
     const versionFormat = "default";
-    const { disposeCallback, git, repoPath } = await makeTempRepo();
+    const {
+      disposeCallback,
+      git,
+      remoteGit,
+      remoteRepoPath,
+      repoPath,
+    } = await makeTempRepoWithRemote();
     try {
       const versionFilePathFull = path.join(repoPath, versionFilePath);
       await fs.writeFile(versionFilePathFull, initialVersion);

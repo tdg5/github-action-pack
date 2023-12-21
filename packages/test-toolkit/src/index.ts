@@ -1,1 +1,1 @@
-export { makeTempRepo } from "./git";
+export { makeTempRepo, makeTempRepoWithRemote } from "./git";

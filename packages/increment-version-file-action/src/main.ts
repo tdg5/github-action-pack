@@ -3,6 +3,7 @@ import * as path from "path";
 import { simpleGit } from "simple-git";
 
 import { incrementVersionFile } from "./incrementVersionFile";
+import { stageFilesAndCommitAndPush } from "github-action-pack-toolkit";
 import { Context } from "./interfaces";
 
 interface MainArguments {
@@ -35,7 +36,12 @@ export async function main({
       authorEmailInput !== ""
         ? authorEmailInput
         : `github-actions-${actor}@users.noreply.github.com`;
-    const repoPath = getInput("repoPath");
+    const branchInput = getInput("branch");
+    const branch = branchInput !== "" ? branchInput : undefined;
+    const remoteInput = getInput("remote");
+    const remote = remoteInput !== "" ? remoteInput : undefined;
+    const repoPathInput = getInput("repoPath");
+    const repoPath = repoPathInput !== "" ? repoPathInput : "./";
     const versionFilePath = getInput("versionFilePath");
     const versionFilePathFull = path.join(repoPath, versionFilePath);
     await incrementVersionFile({
@@ -43,15 +49,15 @@ export async function main({
       versionFormat: getInput("versionFormat"),
     });
 
-    const git = simpleGit(repoPath);
-    await git.add(versionFilePathFull);
-    await git.commit(commitMessage, {
-      "--author": `${authorName} <${authorEmail}>`,
+    await stageFilesAndCommitAndPush({
+      authorEmail,
+      authorName,
+      branch,
+      commitMessage,
+      remote,
+      repoPath,
+      requiredFiles: [versionFilePath],
     });
-    const remotes = await git.getRemotes();
-    if (remotes.length > 0) {
-      await git.push();
-    }
   } catch (error: any) {
     setFailed(error.message);
     throw error;
