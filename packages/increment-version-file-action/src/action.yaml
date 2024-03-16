@@ -7,12 +7,19 @@ inputs:
   authorName:
     description: The author name that should be used by git when commtting the change to the version file.
     required: true
+  branch:
+    description: The name of the branch to push changes to.
+    required: false
   commitMessage:
     description: The commit message to use when commiting the change to the version file.
     required: true
+  remote:
+    description: The name of the remote to push changes to.
+    required: false
   repoPath:
+    default: "./"
     description: The path to the repository with the version file.
-    required: true
+    required: false
   versionFilePath:
     description: The relative path to the version file.
     required: true
