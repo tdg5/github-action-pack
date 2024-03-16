@@ -1,0 +1,23 @@
+{
+  "author": "dannyguinther@gmail.com",
+  "description": "GitHub action to stage files and commit and push changes (if any).",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^5.0.4"
+  },
+  "directories": {
+    "src": "src"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "tsc --noEmit && eslint --fix src/**/*.ts",
+    "test": "jest",
+    "test-watch": "jest --watch"
+  },
+  "main": "src/action.ts",
+  "name": "github-action-pack-stage-files-and-commit-and-push-action",
+  "scope": "tdg5",
+  "version": "0.0.4"
+}
