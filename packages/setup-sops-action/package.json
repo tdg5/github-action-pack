@@ -23,5 +23,5 @@
   "main": "src/action.ts",
   "name": "github-action-pack-setup-sops-action",
   "scope": "tdg5",
-  "version": "0.0.5"
+  "version": "0.0.6"
 }
