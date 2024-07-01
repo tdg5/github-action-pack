@@ -30,5 +30,5 @@ inputs:
     required: false
 name: Stage files, commit, and push any changes.
 runs:
-  main: ../dist/index.js
-  using: node16
+  main: dist/index.js
+  using: node20

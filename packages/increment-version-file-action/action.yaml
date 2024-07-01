@@ -28,5 +28,5 @@ inputs:
     required: true
 name: Increment Version File
 runs:
-  main: ../dist/index.js
-  using: node16
+  main: dist/index.js
+  using: node20
