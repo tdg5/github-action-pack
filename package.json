@@ -24,6 +24,7 @@
   "workspaces": [
     "packages/increment-version-file-action",
     "packages/setup-sops-action",
+    "packages/stage-files-and-commit-and-push-action",
     "packages/test-toolkit",
     "packages/toolkit"
   ]
