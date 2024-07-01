@@ -1,0 +1,27 @@
+{
+  "author": "dannyguinther@gmail.com",
+  "description": "GitHub action to setup mozilla sops.",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.0",
+    "@actions/io": "^1.1.3",
+    "@actions/tool-cache": "^2.0.1",
+    "semver": "^7.6.2"
+  },
+  "directories": {
+    "src": "src"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "tsc --noEmit && eslint --fix src/**/*.ts",
+    "test": "jest",
+    "test-watch": "jest --watch"
+  },
+  "main": "src/action.ts",
+  "name": "github-action-pack-setup-sops-action",
+  "scope": "tdg5",
+  "version": "0.0.5"
+}

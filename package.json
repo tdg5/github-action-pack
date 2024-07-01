@@ -23,6 +23,7 @@
   "scope": "tdg5",
   "workspaces": [
     "packages/increment-version-file-action",
+    "packages/setup-sops-action",
     "packages/test-toolkit",
     "packages/toolkit"
   ]

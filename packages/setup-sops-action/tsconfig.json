@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "noImplicitAny": false
+  },
+  "extends": "../../tsconfig.json",
+  "include": ["jest.config.ts", "src"]
+}

@@ -1,0 +1,19 @@
+# The content of this file is taken from https://raw.githubusercontent.com/mdgreenwald/mozilla-sops-action/main/action.yml,
+# with some minor updates.
+
+name: 'Sops Binary Installer'
+description: 'Install a specific version of the sops binary. Acceptable values are latest or any semantic version string like v3.9.0'
+inputs:
+  version:
+    description: 'Version of sops'
+    required: true
+    default: 'latest'
+outputs:
+  sops-path:
+    description: 'Path to the cached sops binary'
+branding:
+  icon: 'unlock'
+  color: 'gray-dark'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
