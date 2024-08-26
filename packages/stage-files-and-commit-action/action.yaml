@@ -1,0 +1,28 @@
+author: dannyguinther@gmail.com
+description: Stage optional and/or required files and commit any changes.
+inputs:
+  authorEmail:
+    description: The author email that should be used by git when commtting the staged files (if any).
+    required: true
+  authorName:
+    description: The author name that should be used by git when commtting the staged files (if any).
+    required: true
+  commitMessage:
+    description: The commit message to use when commiting the staged files (if any).
+    required: true
+  optionalFilePaths:
+    default: ""
+    description: A list of relative paths that should be staged if they have changes and will be ignored if they don't have changes.
+    required: false
+  repoPath:
+    default: "./"
+    description: The path to the repository which contains the files to stage and commit.
+    required: false
+  requiredFilePaths:
+    default: ""
+    description: A list of relative paths that should be staged if they have changes and will cause an error if they don't have changes.
+    required: false
+name: Stage files and commit any changes.
+runs:
+  main: dist/index.js
+  using: node20
