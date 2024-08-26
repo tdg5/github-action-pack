@@ -2,21 +2,8 @@
 
 set -e -o pipefail
 
-get_repo_dir () {
-  SOURCE="${BASH_SOURCE[0]}"
-  # While $SOURCE is a symlink, resolve it
-  while [ -h "$SOURCE" ]; do
-       DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-       SOURCE="$( readlink "$SOURCE" )"
-       # If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve
-       # it relative to the symlink base directory
-       [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-  done
-  DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
-  echo "$DIR"
-}
-
-REPO_DIR="$(get_repo_dir)"
+# From https://stackoverflow.com/a/4774063
+REPO_DIR="$( cd -- "$(dirname "$0")/.." >/dev/null 2>&1 ; pwd -P )"
 
 PACKAGE_PATHS="$(find $REPO_DIR -name '*-action' -type d -not -wholename '*/node_modules/*')"
 for PACKAGE_PATH in $PACKAGE_PATHS; do
