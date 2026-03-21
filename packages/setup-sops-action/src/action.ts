@@ -11,7 +11,7 @@ import * as toolCache from '@actions/tool-cache';
 import * as core from '@actions/core';
 
 const sopsToolName = 'sops';
-const stableSopsVersion = 'v3.9.0';
+const stableSopsVersion = 'v3.12.2';
 const sopsAllReleasesUrl = 'https://api.github.com/repos/getsops/sops/releases';
 
 function getExecutableExtension(): string {
@@ -39,7 +39,7 @@ async function getstableSopsVersion(): Promise<string> {
     try {
         const downloadPath = await toolCache.downloadTool(sopsAllReleasesUrl);
         const responseArray = JSON.parse(fs.readFileSync(downloadPath, 'utf8').toString().trim());
-        let latestSopsVersion = semver.clean(stableSopsVersion) || "3.9.0";
+        let latestSopsVersion = semver.clean(stableSopsVersion) || "3.12.2";
         responseArray.forEach(response => {
             if (response && response.tag_name) {
                 let currentSopsVerison = semver.clean(response.tag_name.toString());
