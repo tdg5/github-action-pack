@@ -1,19 +1,30 @@
-# The content of this file is taken from https://raw.githubusercontent.com/mdgreenwald/mozilla-sops-action/main/action.yml,
-# with some minor updates.
+# The content of this file is inspired by https://raw.githubusercontent.com/mdgreenwald/mozilla-sops-action/main/action.yml,
+# with significant modifications to use a composite action instead of node.
 
-name: 'Sops Binary Installer'
+name: 'Setup sops'
 description: 'Install a specific version of the sops binary. Acceptable values are latest or any semantic version string like v3.12.2'
 inputs:
   version:
     description: 'Version of sops'
     required: true
     default: 'latest'
+  token:
+    description: 'GitHub token for API requests (avoids rate limiting). Defaults to the automatic GITHUB_TOKEN.'
+    required: false
+    default: ${{ github.token }}
 outputs:
   sops-path:
     description: 'Path to the cached sops binary'
+    value: ${{ steps.install.outputs.sops-path }}
 branding:
   icon: 'unlock'
   color: 'gray-dark'
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: 'composite'
+  steps:
+    - id: install
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: ${{ github.action_path }}/setup-sops.sh
