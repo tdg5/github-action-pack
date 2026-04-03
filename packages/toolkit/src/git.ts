@@ -15,11 +15,20 @@ export const stageFiles = async ({
 }: StageFilesArgs): Promise<void> => {
   const _git = git || simpleGit({ baseDir: repoPath });
   const _requiredFiles = requiredFiles || [];
-  const files: string[] = _requiredFiles.concat(optionalFiles || []);
-  if (files.length === 0) {
+  const _optionalFiles = optionalFiles || [];
+  if (_requiredFiles.length === 0 && _optionalFiles.length === 0) {
     return;
   }
-  await _git.add(files);
+  if (_requiredFiles.length > 0) {
+    await _git.add(_requiredFiles);
+  }
+  for (const file of _optionalFiles) {
+    try {
+      await _git.add(file);
+    } catch {
+      // Optional files are allowed to not exist
+    }
+  }
   const status = await _git.status();
   const staged = new Set(status.staged);
   _requiredFiles.forEach((requiredFile) => {
@@ -47,6 +56,11 @@ export const stageFilesAndCommit = async ({
   const _git: SimpleGit = git || simpleGit({ baseDir: repoPath });
   await stageFiles({ git: _git, optionalFiles, repoPath, requiredFiles });
 
+  const status = await _git.status();
+  if (status.staged.length === 0) {
+    return;
+  }
+
   // Prefer not to set configs, but we can't commit if the configs don't exist
   const userEmailConfig = await _git.getConfig("user.email");
   if (userEmailConfig.values.length === 0) {
@@ -57,9 +71,7 @@ export const stageFilesAndCommit = async ({
     await _git.addConfig("user.name", authorName);
   }
 
-  const _requiredFiles = requiredFiles || [];
-  const files: string[] = _requiredFiles.concat(optionalFiles || []);
-  await _git.commit(commitMessage, files, {
+  await _git.commit(commitMessage, status.staged, {
     "--author": `${authorName} <${authorEmail}>`,
   });
 };

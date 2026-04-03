@@ -2,7 +2,7 @@
 # Setup sops binary. Can be invoked standalone or from the GitHub Action.
 #
 # Environment variables:
-#   VERSION           - Desired sops version ("latest", "v3.12.2", "3.12.2", etc.)
+#   INPUT_VERSION     - Desired sops version ("latest", "v3.12.2", "3.12.2", etc.)
 #   GITHUB_TOKEN      - (optional) GitHub token for authenticated API requests
 #   GITHUB_OUTPUT     - (optional) GitHub Actions output file
 #   GITHUB_PATH       - (optional) GitHub Actions PATH file
@@ -12,14 +12,14 @@
 set -euo pipefail
 
 STABLE_VERSION="v3.12.2"
-VERSION="${VERSION:-latest}"
-VERSION_LOWER="$(echo "$VERSION" | tr '[:upper:]' '[:lower:]')"
+TARGET_VERSION="${INPUT_VERSION:-latest}"
+VERSION_LOWER="$(echo "$TARGET_VERSION" | tr '[:upper:]' '[:lower:]')"
 
 # Resolve 'latest' to actual latest version
 if [[ "$VERSION_LOWER" == "latest" ]]; then
   if ! command -v jq &>/dev/null; then
     echo "::warning::jq not found; cannot resolve latest version. Using default ${STABLE_VERSION}."
-    VERSION="$STABLE_VERSION"
+    TARGET_VERSION="$STABLE_VERSION"
   else
     CURL_ARGS=(-s)
     if [[ -n "${GITHUB_TOKEN:-}" ]]; then
@@ -32,7 +32,7 @@ if [[ "$VERSION_LOWER" == "latest" ]]; then
 
     if [[ "$HTTP_CODE" != "200" ]]; then
       echo "::warning::GitHub API returned HTTP ${HTTP_CODE}. Using default ${STABLE_VERSION}."
-      VERSION="$STABLE_VERSION"
+      TARGET_VERSION="$STABLE_VERSION"
     else
       LATEST=$(jq -r '
         [.[] | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+$"))]
@@ -42,17 +42,17 @@ if [[ "$VERSION_LOWER" == "latest" ]]; then
       ' "$RELEASES_JSON")
 
       if [[ -n "$LATEST" && "$LATEST" != "null" ]]; then
-        VERSION="$LATEST"
+        TARGET_VERSION="$LATEST"
       else
         echo "::warning::Cannot determine latest sops version. Using default ${STABLE_VERSION}."
-        VERSION="$STABLE_VERSION"
+        TARGET_VERSION="$STABLE_VERSION"
       fi
     fi
 
     rm -f "$RELEASES_JSON"
   fi
 elif [[ ! "$VERSION_LOWER" =~ ^v ]]; then
-  VERSION="v${VERSION}"
+  TARGET_VERSION="v${TARGET_VERSION}"
 fi
 
 # Helper to compare semver strings (returns 0 if $1 >= $2)
@@ -70,14 +70,14 @@ version_gte() {
   return 0
 }
 
-DESIRED_VERSION="${VERSION#v}"
+DESIRED_VERSION="${TARGET_VERSION#v}"
 
 # Check for an existing sops installation
 if [[ "${FORCE_INSTALL:-}" != "true" ]] && command -v sops &>/dev/null; then
   EXISTING_VERSION=$(sops --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
   if [[ -n "$EXISTING_VERSION" ]] && version_gte "$EXISTING_VERSION" "$DESIRED_VERSION"; then
     EXISTING_PATH="$(command -v sops)"
-    echo "Existing sops ${EXISTING_VERSION} >= requested ${VERSION}; skipping install."
+    echo "Existing sops ${EXISTING_VERSION} >= requested ${TARGET_VERSION}; skipping install."
     if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
       echo "sops-path=${EXISTING_PATH}" >> "$GITHUB_OUTPUT"
     fi
@@ -85,7 +85,7 @@ if [[ "${FORCE_INSTALL:-}" != "true" ]] && command -v sops &>/dev/null; then
   fi
 fi
 
-echo "Installing sops ${VERSION}..."
+echo "Installing sops ${TARGET_VERSION}..."
 
 # Determine OS and architecture
 OS="$(uname -s)"
@@ -112,10 +112,10 @@ case "$OS" in
     ;;
 esac
 
-DOWNLOAD_URL="https://github.com/getsops/sops/releases/download/${VERSION}/sops-${VERSION}.${SUFFIX}"
+DOWNLOAD_URL="https://github.com/getsops/sops/releases/download/${TARGET_VERSION}/sops-${TARGET_VERSION}.${SUFFIX}"
 
 # Set up install directory
-INSTALL_DIR="${RUNNER_TOOL_CACHE:-${HOME}/.sops}/sops/${VERSION}"
+INSTALL_DIR="${RUNNER_TOOL_CACHE:-${HOME}/.sops}/sops/${TARGET_VERSION}"
 mkdir -p "$INSTALL_DIR"
 
 SOPS_PATH="${INSTALL_DIR}/sops"
@@ -138,4 +138,4 @@ fi
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "sops-path=${SOPS_PATH}" >> "$GITHUB_OUTPUT"
 fi
-echo "Sops tool version: '${VERSION}' has been cached at ${SOPS_PATH}"
+echo "Sops tool version: '${TARGET_VERSION}' has been cached at ${SOPS_PATH}"

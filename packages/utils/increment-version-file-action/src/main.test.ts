@@ -7,6 +7,77 @@ import { makeTempRepoWithRemote } from "github-action-pack-test-toolkit";
 import { main } from "./main";
 
 describe("main", () => {
+  test("skips for an inactive event", async () => {
+    const log = jest.fn();
+    await main({
+      context: { actor: "test@example.com", eventName: "pull_request" },
+      getInput: (): string => "",
+      log,
+      setFailed: (): void => {},
+    });
+    expect(log).toHaveBeenCalledWith(
+      "Skipping increment-version-file for event pull_request",
+    );
+  });
+
+  test("runs for a custom active event", async () => {
+    const initialVersion = "9.9.9";
+    const commitMessage = "commitMessage";
+    const authorEmail = "authorEmail";
+    const authorName = "authorName";
+    const versionFilePath = "versionFilePath";
+    const versionFormat = "default";
+    const { disposeCallback, remoteGit, repoPath } =
+      await makeTempRepoWithRemote();
+    try {
+      const remoteInitialLog = (await remoteGit.log({ maxCount: 1 })).latest;
+      if (remoteInitialLog === null) {
+        throw Error("Failed to initialize remote repo");
+      }
+      const initialRef = (await remoteGit.status()).current;
+      await remoteGit.checkout({ "--detach": null });
+
+      const versionFilePathFull = path.join(repoPath, versionFilePath);
+      await fs.writeFile(versionFilePathFull, initialVersion);
+
+      await main({
+        context: { actor: "test@example.com", eventName: "pull_request" },
+        getInput: (key: string): string => {
+          const inputs: { [key: string]: string } = {
+            activeEvents: "pull_request",
+            authorEmail,
+            authorName,
+            commitMessage,
+            repoPath,
+            versionFilePath,
+            versionFormat,
+          };
+          return key in inputs ? inputs[key] : "";
+        },
+        log: (): void => {},
+        setFailed: (): void => {},
+      });
+
+      const newVersion = await fs.readFile(versionFilePathFull, "utf-8");
+      expect(newVersion).toBe(
+        incrementVersion({
+          format: versionFormat,
+          version: initialVersion,
+        }),
+      );
+
+      const remoteFinalLog = (
+        await remoteGit.log({ from: initialRef, maxCount: 1 })
+      ).latest;
+      if (remoteFinalLog === null) {
+        throw Error("Failed to fetch log from remote repo");
+      }
+      expect(remoteFinalLog.message).toEqual(commitMessage);
+    } finally {
+      disposeCallback();
+    }
+  });
+
   test("basic invocation", async () => {
     const initialVersion = "9.9.9";
     const commitMessage = "commitMessage";

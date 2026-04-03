@@ -8,6 +8,68 @@ import { makeTempRepo } from "github-action-pack-test-toolkit";
 import { main } from "./main";
 
 describe("main", () => {
+  test("skips for an inactive event", async () => {
+    const log = jest.fn();
+    await main({
+      context: { actor: "test@example.com", eventName: "pull_request" },
+      getInput: (): string => "",
+      log,
+      setFailed: (): void => {},
+    });
+    expect(log).toHaveBeenCalledWith(
+      "Skipping stage-files-and-commit for event pull_request",
+    );
+  });
+
+  test("runs for a custom active event", async () => {
+    const commitMessage = "commitMessage";
+    const authorEmail = "authorEmail";
+    const authorName = "authorName";
+    const { disposeCallback, git, repoPath } = await makeTempRepo();
+
+    try {
+      const requiredFilePath = "required.txt";
+      const requiredFilePathFull = path.join(repoPath, requiredFilePath);
+      await fs.writeFile(requiredFilePathFull, "required-1");
+
+      await stageFilesAndCommit({
+        authorEmail: "baseAuthorEmail",
+        authorName: "baseAuthorName",
+        commitMessage: "Commit test files",
+        git: git,
+        repoPath: repoPath,
+        requiredFiles: [requiredFilePath],
+      });
+
+      await fs.writeFile(requiredFilePathFull, "required-2");
+
+      await main({
+        context: { actor: "test@example.com", eventName: "pull_request" },
+        getInput: (key: string): string => {
+          const inputs: { [key: string]: string } = {
+            activeEvents: "pull_request",
+            authorEmail,
+            authorName,
+            commitMessage,
+            repoPath,
+            requiredFilePaths: requiredFilePath,
+          };
+          return key in inputs ? inputs[key] : "";
+        },
+        log: (): void => {},
+        setFailed: (): void => {},
+      });
+
+      const finalLog = (await git.log({ maxCount: 1 })).latest;
+      if (finalLog === null) {
+        throw Error("Failed to fetch log from repo");
+      }
+      expect(finalLog.message).toEqual(commitMessage);
+    } finally {
+      disposeCallback();
+    }
+  });
+
   test("basic invocation", async () => {
     const commitMessage = "commitMessage";
     const authorEmail = "authorEmail";

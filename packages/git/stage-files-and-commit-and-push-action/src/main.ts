@@ -17,7 +17,14 @@ export async function main({
 }: MainArguments): Promise<void> {
   try {
     const eventName = context.eventName;
-    if (!["push", "workflow_dispatch"].includes(eventName)) {
+    const activeEventsInput = getInput("activeEvents");
+    const activeEvents =
+      activeEventsInput !== ""
+        ? activeEventsInput
+            .split(/\s+/)
+            .filter((event: string) => event.length > 0)
+        : ["push", "workflow_dispatch"];
+    if (!activeEvents.includes(eventName)) {
       log(`Skipping stage-files-and-commit-and-push for event ${eventName}`);
       return;
     }

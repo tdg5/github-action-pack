@@ -1,6 +1,10 @@
 author: dannyguinther@gmail.com
 description: Stage optional and/or required files and commit any changes.
 inputs:
+  activeEvents:
+    default: "push workflow_dispatch"
+    description: A whitespace-delimited list of GitHub event names for which this action should run. The action will be a no-op for events not in this list.
+    required: false
   authorEmail:
     description: The author email that should be used by git when commtting the staged files (if any).
     required: true

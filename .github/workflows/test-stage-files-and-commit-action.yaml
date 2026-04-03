@@ -19,20 +19,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Create test files
+      - name: Configure git user
         run: |
+          git config --global user.email "test@example.com"
+          git config --global user.name "Test User"
+      - name: Create test repo and files
+        run: |
+          git init /tmp/test-repo
+          cd /tmp/test-repo
+          git commit --allow-empty -m "initial commit"
           echo "required content" > test-required.txt
           echo "optional content" > test-optional.txt
       - name: Run stage-files-and-commit-action
         uses: ./actions/git/stage-files-and-commit-action
         with:
+          activeEvents: "pull_request push workflow_dispatch"
           authorEmail: "test@example.com"
           authorName: "Test User"
           commitMessage: "test: stage required and optional files"
+          repoPath: "/tmp/test-repo"
           requiredFilePaths: "test-required.txt"
           optionalFilePaths: "test-optional.txt"
       - name: Verify commit was created
         run: |
+          cd /tmp/test-repo
           LAST_MESSAGE=$(git log -1 --pretty=%s)
           echo "Last commit message: ${LAST_MESSAGE}"
           test "$LAST_MESSAGE" = "test: stage required and optional files"
@@ -47,15 +57,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Configure git user
+        run: |
+          git config --global user.email "test@example.com"
+          git config --global user.name "Test User"
+      - name: Create test repo
+        run: |
+          git init /tmp/test-repo
+          cd /tmp/test-repo
+          git commit --allow-empty -m "initial commit"
       - name: Run with no changes (should be a no-op)
         uses: ./actions/git/stage-files-and-commit-action
         with:
+          activeEvents: "pull_request push workflow_dispatch"
           authorEmail: "test@example.com"
           authorName: "Test User"
           commitMessage: "this commit should not exist"
+          repoPath: "/tmp/test-repo"
           optionalFilePaths: "nonexistent.txt"
       - name: Verify no new commit was created
         run: |
+          cd /tmp/test-repo
           LAST_MESSAGE=$(git log -1 --pretty=%s)
           echo "Last commit message: ${LAST_MESSAGE}"
           test "$LAST_MESSAGE" != "this commit should not exist"

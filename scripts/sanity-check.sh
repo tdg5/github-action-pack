@@ -8,6 +8,16 @@ cd "$REPO_DIR"
 
 FAILED=0
 
+# Ensure git user is configured in CI (needed by tests that make commits)
+if [ "${CI:-}" = "true" ]; then
+  if ! git config user.email &>/dev/null; then
+    git config --global user.email "sanity-check@example.com"
+  fi
+  if ! git config user.name &>/dev/null; then
+    git config --global user.name "Sanity Check"
+  fi
+fi
+
 # Set up Python virtual environment
 VENV_DIR="$REPO_DIR/.venv"
 if [ ! -d "$VENV_DIR" ]; then
