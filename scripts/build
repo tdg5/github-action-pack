@@ -22,6 +22,6 @@ for PACKAGE_PATH in $PACKAGE_PATHS; do
   ACTION_PATHS="$(find "$PACKAGE_PATH" -type f -name 'action.ts' -not -wholename '*/node_modules/*')"
   for ACTION_PATH in $ACTION_PATHS; do
     echo "Building action ${ACTION_PATH}..."
-    pnpm exec ncc build -m "$ACTION_PATH" -o "$ACTION_DIR"
+    pnpm exec esbuild "$ACTION_PATH" --bundle --platform=node --target=node20 --outfile="$ACTION_DIR/index.js" --minify
   done
 done
