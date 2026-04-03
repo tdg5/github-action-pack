@@ -1,5 +1,8 @@
 {
   "author": "dannyguinther@gmail.com",
+  "dependencies": {
+    "simple-git": "^3.21.0"
+  },
   "description": "Toolkit of various utilities for testing github-action-pack",
   "directories": {
     "src": "src"

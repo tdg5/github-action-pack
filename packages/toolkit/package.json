@@ -3,6 +3,9 @@
   "dependencies": {
     "simple-git": "^3.21.0"
   },
+  "devDependencies": {
+    "github-action-pack-test-toolkit": "workspace:*"
+  },
   "description": "Toolkit of various GitHub action utilities",
   "directories": {
     "src": "src"

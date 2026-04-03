@@ -3,7 +3,11 @@
   "description": "GitHub action to increment version files in various languages.",
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@actions/github": "^5.0.4"
+    "@actions/github": "^5.0.4",
+    "github-action-pack-toolkit": "workspace:*"
+  },
+  "devDependencies": {
+    "github-action-pack-test-toolkit": "workspace:*"
   },
   "directories": {
     "src": "src"
