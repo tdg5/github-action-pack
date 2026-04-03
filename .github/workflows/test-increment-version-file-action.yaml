@@ -1,0 +1,72 @@
+name: Test increment-version-file-action
+
+on:
+  pull_request:
+    paths:
+      - "actions/increment-version-file-action/**"
+      - "packages/increment-version-file-action/**"
+      - "packages/toolkit/**"
+  push:
+    branches: [main]
+    paths:
+      - "actions/increment-version-file-action/**"
+      - "packages/increment-version-file-action/**"
+      - "packages/toolkit/**"
+  workflow_dispatch:
+
+jobs:
+  test-default-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up local bare remote
+        run: |
+          git clone --bare . /tmp/test-remote.git
+          git remote set-url origin /tmp/test-remote.git
+      - name: Create version file and initial commit
+        run: |
+          echo "1.0.0" > VERSION
+          git add VERSION
+          git commit -m "Add VERSION file"
+          git push origin HEAD
+      - name: Run increment-version-file-action
+        uses: ./actions/increment-version-file-action
+        with:
+          authorEmail: "test@example.com"
+          authorName: "Test User"
+          commitMessage: "test: increment version"
+          versionFilePath: "VERSION"
+          versionFormat: "default"
+      - name: Verify version was incremented
+        run: |
+          NEW_VERSION=$(cat VERSION)
+          echo "New version: ${NEW_VERSION}"
+          test "$NEW_VERSION" = "1.0.1-alpha-000"
+
+  test-python-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up local bare remote
+        run: |
+          git clone --bare . /tmp/test-remote.git
+          git remote set-url origin /tmp/test-remote.git
+      - name: Create version file and initial commit
+        run: |
+          echo "2.3.4" > VERSION
+          git add VERSION
+          git commit -m "Add VERSION file"
+          git push origin HEAD
+      - name: Run increment-version-file-action (python format)
+        uses: ./actions/increment-version-file-action
+        with:
+          authorEmail: "test@example.com"
+          authorName: "Test User"
+          commitMessage: "test: increment python version"
+          versionFilePath: "VERSION"
+          versionFormat: "python"
+      - name: Verify version was incremented
+        run: |
+          NEW_VERSION=$(cat VERSION)
+          echo "New version: ${NEW_VERSION}"
+          test "$NEW_VERSION" = "2.3.5a0"

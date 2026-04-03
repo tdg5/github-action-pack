@@ -1,0 +1,45 @@
+name: Test stage-files-and-commit-and-push-action
+
+on:
+  pull_request:
+    paths:
+      - "actions/stage-files-and-commit-and-push-action/**"
+      - "packages/stage-files-and-commit-and-push-action/**"
+      - "packages/toolkit/**"
+  push:
+    branches: [main]
+    paths:
+      - "actions/stage-files-and-commit-and-push-action/**"
+      - "packages/stage-files-and-commit-and-push-action/**"
+      - "packages/toolkit/**"
+  workflow_dispatch:
+
+jobs:
+  test-commit-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up local bare remote
+        run: |
+          git clone --bare . /tmp/test-remote.git
+          git remote set-url origin /tmp/test-remote.git
+      - name: Create test file
+        run: echo "push test content" > test-push.txt
+      - name: Run stage-files-and-commit-and-push-action
+        uses: ./actions/stage-files-and-commit-and-push-action
+        with:
+          authorEmail: "test@example.com"
+          authorName: "Test User"
+          commitMessage: "test: stage, commit, and push"
+          requiredFilePaths: "test-push.txt"
+      - name: Verify commit was created and pushed
+        run: |
+          LAST_MESSAGE=$(git log -1 --pretty=%s)
+          echo "Last commit message: ${LAST_MESSAGE}"
+          test "$LAST_MESSAGE" = "test: stage, commit, and push"
+
+          LOCAL_SHA=$(git rev-parse HEAD)
+          REMOTE_SHA=$(git ls-remote /tmp/test-remote.git HEAD | cut -f1)
+          echo "Local SHA: ${LOCAL_SHA}"
+          echo "Remote SHA: ${REMOTE_SHA}"
+          test "$LOCAL_SHA" = "$REMOTE_SHA"
