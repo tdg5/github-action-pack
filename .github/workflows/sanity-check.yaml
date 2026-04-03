@@ -1,0 +1,32 @@
+name: Sanity check
+
+on:
+  pull_request:
+    branches: [main]
+
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs:
+  sanity-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - uses: pnpm/action-setup@v5
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run sanity check
+        run: scripts/sanity-check.sh
