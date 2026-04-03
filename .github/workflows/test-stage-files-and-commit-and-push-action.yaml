@@ -3,14 +3,14 @@ name: Test stage-files-and-commit-and-push-action
 on:
   pull_request:
     paths:
-      - "actions/stage-files-and-commit-and-push-action/**"
-      - "packages/stage-files-and-commit-and-push-action/**"
+      - "actions/git/stage-files-and-commit-and-push-action/**"
+      - "packages/git/stage-files-and-commit-and-push-action/**"
       - "packages/toolkit/**"
   push:
     branches: [main]
     paths:
-      - "actions/stage-files-and-commit-and-push-action/**"
-      - "packages/stage-files-and-commit-and-push-action/**"
+      - "actions/git/stage-files-and-commit-and-push-action/**"
+      - "packages/git/stage-files-and-commit-and-push-action/**"
       - "packages/toolkit/**"
   workflow_dispatch:
 
@@ -26,7 +26,7 @@ jobs:
       - name: Create test file
         run: echo "push test content" > test-push.txt
       - name: Run stage-files-and-commit-and-push-action
-        uses: ./actions/stage-files-and-commit-and-push-action
+        uses: ./actions/git/stage-files-and-commit-and-push-action
         with:
           authorEmail: "test@example.com"
           authorName: "Test User"

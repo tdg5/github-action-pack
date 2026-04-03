@@ -3,11 +3,11 @@ name: Test setup-sops-action
 on:
   pull_request:
     paths:
-      - "actions/setup-sops-action/**"
+      - "actions/tools/setup-sops-action/**"
   push:
     branches: [main]
     paths:
-      - "actions/setup-sops-action/**"
+      - "actions/tools/setup-sops-action/**"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Install sops (latest)
         id: setup-sops
-        uses: ./actions/setup-sops-action
+        uses: ./actions/tools/setup-sops-action
       - name: Verify sops is installed
         run: |
           sops --version
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Install sops v3.9.0
         id: setup-sops
-        uses: ./actions/setup-sops-action
+        uses: ./actions/tools/setup-sops-action
         with:
           version: "v3.9.0"
       - name: Verify correct version

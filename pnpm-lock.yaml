@@ -54,7 +54,7 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
-  packages/increment-version-file-action:
+  packages/git/stage-files-and-commit-action:
     dependencies:
       '@actions/core':
         specifier: ^1.10.1
@@ -64,13 +64,13 @@ importers:
         version: 5.1.1
       github-action-pack-toolkit:
         specifier: workspace:*
-        version: link:../toolkit
+        version: link:../../toolkit
     devDependencies:
       github-action-pack-test-toolkit:
         specifier: workspace:*
-        version: link:../test-toolkit
+        version: link:../../test-toolkit
 
-  packages/stage-files-and-commit-action:
+  packages/git/stage-files-and-commit-and-push-action:
     dependencies:
       '@actions/core':
         specifier: ^1.10.1
@@ -80,27 +80,11 @@ importers:
         version: 5.1.1
       github-action-pack-toolkit:
         specifier: workspace:*
-        version: link:../toolkit
+        version: link:../../toolkit
     devDependencies:
       github-action-pack-test-toolkit:
         specifier: workspace:*
-        version: link:../test-toolkit
-
-  packages/stage-files-and-commit-and-push-action:
-    dependencies:
-      '@actions/core':
-        specifier: ^1.10.1
-        version: 1.11.1
-      '@actions/github':
-        specifier: ^5.0.4
-        version: 5.1.1
-      github-action-pack-toolkit:
-        specifier: workspace:*
-        version: link:../toolkit
-    devDependencies:
-      github-action-pack-test-toolkit:
-        specifier: workspace:*
-        version: link:../test-toolkit
+        version: link:../../test-toolkit
 
   packages/test-toolkit:
     dependencies:
@@ -117,6 +101,22 @@ importers:
       github-action-pack-test-toolkit:
         specifier: workspace:*
         version: link:../test-toolkit
+
+  packages/utils/increment-version-file-action:
+    dependencies:
+      '@actions/core':
+        specifier: ^1.10.1
+        version: 1.11.1
+      '@actions/github':
+        specifier: ^5.0.4
+        version: 5.1.1
+      github-action-pack-toolkit:
+        specifier: workspace:*
+        version: link:../../toolkit
+    devDependencies:
+      github-action-pack-test-toolkit:
+        specifier: workspace:*
+        version: link:../../test-toolkit
 
 packages:
 

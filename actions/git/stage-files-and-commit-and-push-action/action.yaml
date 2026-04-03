@@ -1,5 +1,5 @@
-# This file is a copy of packages/stage-files-and-commit-and-push-action/action.yaml.
-# Changes should be made to packages/stage-files-and-commit-and-push-action/action.yaml, not this file.
+# This file is a copy of packages/git/stage-files-and-commit-and-push-action/action.yaml.
+# Changes should be made to packages/git/stage-files-and-commit-and-push-action/action.yaml, not this file.
 
 author: dannyguinther@gmail.com
 description: Stage optional and/or required files and commit and push any changes.

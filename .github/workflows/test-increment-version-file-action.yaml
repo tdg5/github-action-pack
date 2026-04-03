@@ -3,14 +3,14 @@ name: Test increment-version-file-action
 on:
   pull_request:
     paths:
-      - "actions/increment-version-file-action/**"
-      - "packages/increment-version-file-action/**"
+      - "actions/utils/increment-version-file-action/**"
+      - "packages/utils/increment-version-file-action/**"
       - "packages/toolkit/**"
   push:
     branches: [main]
     paths:
-      - "actions/increment-version-file-action/**"
-      - "packages/increment-version-file-action/**"
+      - "actions/utils/increment-version-file-action/**"
+      - "packages/utils/increment-version-file-action/**"
       - "packages/toolkit/**"
   workflow_dispatch:
 
@@ -30,7 +30,7 @@ jobs:
           git commit -m "Add VERSION file"
           git push origin HEAD
       - name: Run increment-version-file-action
-        uses: ./actions/increment-version-file-action
+        uses: ./actions/utils/increment-version-file-action
         with:
           authorEmail: "test@example.com"
           authorName: "Test User"
@@ -58,7 +58,7 @@ jobs:
           git commit -m "Add VERSION file"
           git push origin HEAD
       - name: Run increment-version-file-action (python format)
-        uses: ./actions/increment-version-file-action
+        uses: ./actions/utils/increment-version-file-action
         with:
           authorEmail: "test@example.com"
           authorName: "Test User"

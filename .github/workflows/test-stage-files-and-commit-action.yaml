@@ -3,14 +3,14 @@ name: Test stage-files-and-commit-action
 on:
   pull_request:
     paths:
-      - "actions/stage-files-and-commit-action/**"
-      - "packages/stage-files-and-commit-action/**"
+      - "actions/git/stage-files-and-commit-action/**"
+      - "packages/git/stage-files-and-commit-action/**"
       - "packages/toolkit/**"
   push:
     branches: [main]
     paths:
-      - "actions/stage-files-and-commit-action/**"
-      - "packages/stage-files-and-commit-action/**"
+      - "actions/git/stage-files-and-commit-action/**"
+      - "packages/git/stage-files-and-commit-action/**"
       - "packages/toolkit/**"
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
           echo "required content" > test-required.txt
           echo "optional content" > test-optional.txt
       - name: Run stage-files-and-commit-action
-        uses: ./actions/stage-files-and-commit-action
+        uses: ./actions/git/stage-files-and-commit-action
         with:
           authorEmail: "test@example.com"
           authorName: "Test User"
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run with no changes (should be a no-op)
-        uses: ./actions/stage-files-and-commit-action
+        uses: ./actions/git/stage-files-and-commit-action
         with:
           authorEmail: "test@example.com"
           authorName: "Test User"
