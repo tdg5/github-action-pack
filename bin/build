@@ -5,12 +5,22 @@ set -e -o pipefail
 # From https://stackoverflow.com/a/4774063
 REPO_DIR="$( cd -- "$(dirname "$0")/.." >/dev/null 2>&1 ; pwd -P )"
 
-PACKAGE_PATHS="$(find $REPO_DIR -name '*-action' -type d -not -wholename '*/node_modules/*')"
+PACKAGE_PATHS="$(find "$REPO_DIR/packages" -maxdepth 1 -name '*-action' -type d)"
 for PACKAGE_PATH in $PACKAGE_PATHS; do
-  echo "Building package ${PACKAGE_PATH}..."
+  PACKAGE_NAME="$(basename "$PACKAGE_PATH")"
+  ACTION_DIR="$REPO_DIR/actions/$PACKAGE_NAME"
+  echo "Building package ${PACKAGE_NAME}..."
+  mkdir -p "$ACTION_DIR"
+  RELATIVE_SOURCE="packages/$PACKAGE_NAME/action.yaml"
+  {
+    echo "# This file is a copy of $RELATIVE_SOURCE."
+    echo "# Changes should be made to $RELATIVE_SOURCE, not this file."
+    echo ""
+    cat "$PACKAGE_PATH/action.yaml"
+  } > "$ACTION_DIR/action.yaml"
   ACTION_PATHS="$(find "$PACKAGE_PATH" -type f -name 'action.ts' -not -wholename '*/node_modules/*')"
   for ACTION_PATH in $ACTION_PATHS; do
     echo "Building action ${ACTION_PATH}..."
-    npx ncc build -m "$ACTION_PATH" -o "$PACKAGE_PATH/dist"
+    npx ncc build -m "$ACTION_PATH" -o "$ACTION_DIR"
   done
 done

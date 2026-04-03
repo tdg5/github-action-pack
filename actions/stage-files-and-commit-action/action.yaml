@@ -1,3 +1,6 @@
+# This file is a copy of packages/stage-files-and-commit-action/action.yaml.
+# Changes should be made to packages/stage-files-and-commit-action/action.yaml, not this file.
+
 author: dannyguinther@gmail.com
 description: Stage optional and/or required files and commit any changes.
 inputs:

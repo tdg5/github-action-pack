@@ -1,3 +1,6 @@
+# This file is a copy of packages/increment-version-file-action/action.yaml.
+# Changes should be made to packages/increment-version-file-action/action.yaml, not this file.
+
 author: dannyguinther@gmail.com
 description: Increment various kinds of version files and commit those changes.
 inputs:
