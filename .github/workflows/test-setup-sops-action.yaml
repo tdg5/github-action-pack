@@ -1,0 +1,39 @@
+name: Test setup-sops-action
+
+on:
+  pull_request:
+    paths:
+      - "actions/setup-sops-action/**"
+  push:
+    branches: [main]
+    paths:
+      - "actions/setup-sops-action/**"
+  workflow_dispatch:
+
+jobs:
+  test-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install sops (latest)
+        id: setup-sops
+        uses: ./actions/setup-sops-action
+      - name: Verify sops is installed
+        run: |
+          sops --version
+          test -x "${{ steps.setup-sops.outputs.sops-path }}"
+
+  test-specific-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install sops v3.9.0
+        id: setup-sops
+        uses: ./actions/setup-sops-action
+        with:
+          version: "v3.9.0"
+      - name: Verify correct version
+        run: |
+          INSTALLED_VERSION=$(sops --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+          echo "Installed version: ${INSTALLED_VERSION}"
+          test "$INSTALLED_VERSION" = "3.9.0"

@@ -1,0 +1,61 @@
+name: Test stage-files-and-commit-action
+
+on:
+  pull_request:
+    paths:
+      - "actions/stage-files-and-commit-action/**"
+      - "packages/stage-files-and-commit-action/**"
+      - "packages/toolkit/**"
+  push:
+    branches: [main]
+    paths:
+      - "actions/stage-files-and-commit-action/**"
+      - "packages/stage-files-and-commit-action/**"
+      - "packages/toolkit/**"
+  workflow_dispatch:
+
+jobs:
+  test-with-required-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create test files
+        run: |
+          echo "required content" > test-required.txt
+          echo "optional content" > test-optional.txt
+      - name: Run stage-files-and-commit-action
+        uses: ./actions/stage-files-and-commit-action
+        with:
+          authorEmail: "test@example.com"
+          authorName: "Test User"
+          commitMessage: "test: stage required and optional files"
+          requiredFilePaths: "test-required.txt"
+          optionalFilePaths: "test-optional.txt"
+      - name: Verify commit was created
+        run: |
+          LAST_MESSAGE=$(git log -1 --pretty=%s)
+          echo "Last commit message: ${LAST_MESSAGE}"
+          test "$LAST_MESSAGE" = "test: stage required and optional files"
+
+          LAST_AUTHOR=$(git log -1 --pretty=%an)
+          test "$LAST_AUTHOR" = "Test User"
+
+          LAST_EMAIL=$(git log -1 --pretty=%ae)
+          test "$LAST_EMAIL" = "test@example.com"
+
+  test-no-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run with no changes (should be a no-op)
+        uses: ./actions/stage-files-and-commit-action
+        with:
+          authorEmail: "test@example.com"
+          authorName: "Test User"
+          commitMessage: "this commit should not exist"
+          optionalFilePaths: "nonexistent.txt"
+      - name: Verify no new commit was created
+        run: |
+          LAST_MESSAGE=$(git log -1 --pretty=%s)
+          echo "Last commit message: ${LAST_MESSAGE}"
+          test "$LAST_MESSAGE" != "this commit should not exist"
