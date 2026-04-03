@@ -75,6 +75,8 @@ run_check "action.yaml sync check" bash -c '
   exit $STATUS
 '
 
+run_check "Release Claude Plugin action tests" tests/release-claude-plugin-action/test.sh
+
 run_check "YAML validation" python3 "$REPO_DIR/scripts/validate-yaml.py"
 
 echo ""

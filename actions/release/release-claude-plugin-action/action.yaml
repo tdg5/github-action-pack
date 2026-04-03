@@ -1,0 +1,39 @@
+name: 'Release Claude Plugin'
+description: 'Release Claude Code plugins to a marketplace release branch'
+author: dannyguinther@gmail.com
+branding:
+  icon: 'package'
+  color: 'purple'
+inputs:
+  plugins_dir:
+    description: 'Directory containing plugin subdirectories to scan'
+    required: false
+    default: 'claude-plugins'
+  release_branch:
+    description: 'Branch to push assembled marketplace.json and plugin files to'
+    required: false
+    default: 'latest'
+  token:
+    description: 'GitHub token for creating releases and pushing. Defaults to the automatic GITHUB_TOKEN.'
+    required: false
+    default: ${{ github.token }}
+  mark_as_latest:
+    description: 'Mark created GitHub Releases as latest'
+    required: false
+    default: 'true'
+  dry_run:
+    description: 'Log what would happen without executing side effects (pushing tags, creating releases, pushing release branch)'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - id: release
+      shell: bash
+      env:
+        INPUT_PLUGINS_DIR: ${{ inputs.plugins_dir }}
+        INPUT_RELEASE_BRANCH: ${{ inputs.release_branch }}
+        INPUT_TOKEN: ${{ inputs.token }}
+        INPUT_MARK_AS_LATEST: ${{ inputs.mark_as_latest }}
+        INPUT_DRY_RUN: ${{ inputs.dry_run }}
+      run: ${{ github.action_path }}/release-claude-plugin.sh
