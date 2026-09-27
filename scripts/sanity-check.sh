@@ -75,6 +75,20 @@ run_check "action.yaml sync check" bash -c '
   exit $STATUS
 '
 
+run_check "publish-image action tests" tests/publish-image-action/test.sh
+
+PUBLISH_IMAGE_SHELL_FILES=(
+  actions/docker/publish-image-action/publish-image.sh
+  tests/publish-image-action/test.sh
+  tests/publish-image-action/test-helpers.sh
+)
+if command -v shellcheck >/dev/null 2>&1; then
+  run_check "shellcheck (publish-image action)" shellcheck "${PUBLISH_IMAGE_SHELL_FILES[@]}"
+else
+  run_check "shellcheck (publish-image action)" docker run --rm -v "$REPO_DIR:/mnt" -w /mnt \
+    koalaman/shellcheck:stable "${PUBLISH_IMAGE_SHELL_FILES[@]}"
+fi
+
 run_check "YAML validation" python3 "$REPO_DIR/scripts/validate-yaml.py"
 
 echo ""
