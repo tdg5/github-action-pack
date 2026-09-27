@@ -76,6 +76,7 @@ run_check "action.yaml sync check" bash -c '
 '
 
 run_check "publish-image action tests" tests/publish-image-action/test.sh
+run_check "publish-image action.yaml check" python3 tests/publish-image-action/check-action.py
 
 PUBLISH_IMAGE_SHELL_FILES=(
   actions/docker/publish-image-action/publish-image.sh

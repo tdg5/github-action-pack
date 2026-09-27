@@ -1,0 +1,154 @@
+# Extracted from tdg5/infrastructure's publish-image workflow. The shell lives
+# in publish-image.sh; this file runs its subcommands around the same
+# third-party steps, in the same order and at the same versions.
+#
+# The caller owns: workflow_dispatch, permissions (contents, id-token and
+# packages: write), a checkout with fetch-depth: 0, per-image concurrency,
+# and any branch guard.
+
+name: 'Publish image'
+author: 'dannyguinther@gmail.com'
+description: 'Build one image from the caller''s checkout, push :<version>, :latest and :<git-sha> to ECR or GHCR, then create the git tag <image>/v<version> and a GitHub Release.'
+inputs:
+  aws-region:
+    description: 'AWS region of the ECR registry. Used only for registry: ecr.'
+    required: false
+    default: 'us-east-1'
+  aws-role-arn:
+    description: 'IAM role to assume via GitHub OIDC. Required when the image''s build config says registry: ecr.'
+    required: false
+    default: ''
+  context:
+    description: 'Docker build context, relative to the checkout root.'
+    required: false
+    default: '.'
+  default-build-config:
+    description: 'Build config used when <images-root>/<image>/build-config.yaml does not exist. Empty means the per-image file is required.'
+    required: false
+    default: ''
+  first-publish-notes-limit:
+    description: 'Cap on the number of commits in a first publish''s release notes (no previous-version). Empty means no cap.'
+    required: false
+    default: ''
+  image:
+    description: 'Image to publish: one or more /-separated lowercase segments. Its Dockerfile is <images-root>/<image>/Dockerfile.'
+    required: true
+  images-root:
+    description: 'Directory holding one subdirectory per image, relative to the checkout root.'
+    required: true
+  previous-version:
+    description: 'Previous published version, to scope the release notes. Required once the image has a <image>/v* tag; empty only for the first publish.'
+    required: false
+    default: ''
+  repository-prefix:
+    description: 'Prefix for the published repository name, which is <repository-prefix><image>. The git tag stays <image>/v<version>.'
+    required: false
+    default: ''
+  source-token:
+    description: 'Optional token mounted only as the BuildKit secret source_token, never as a build arg. Empty means no secret is passed.'
+    required: false
+    default: ''
+  token:
+    description: 'GitHub token for the GHCR login and the Release. Defaults to the automatic GITHUB_TOKEN.'
+    required: false
+    default: ${{ github.token }}
+  version:
+    description: 'Version to publish (e.g. 0.1.0, no leading v).'
+    required: true
+branding:
+  icon: 'package'
+  color: 'gray-dark'
+runs:
+  using: 'composite'
+  steps:
+    - id: prepare
+      name: Validate inputs and resolve build config
+      shell: bash
+      env:
+        INPUT_AWS_ROLE_ARN: ${{ inputs.aws-role-arn }}
+        INPUT_DEFAULT_BUILD_CONFIG: ${{ inputs.default-build-config }}
+        INPUT_FIRST_PUBLISH_NOTES_LIMIT: ${{ inputs.first-publish-notes-limit }}
+        INPUT_IMAGE: ${{ inputs.image }}
+        INPUT_IMAGES_ROOT: ${{ inputs.images-root }}
+        INPUT_PREVIOUS_VERSION: ${{ inputs.previous-version }}
+        INPUT_VERSION: ${{ inputs.version }}
+      run: ${{ github.action_path }}/publish-image.sh prepare
+
+    - name: Configure AWS credentials (OIDC)
+      if: steps.prepare.outputs.registry == 'ecr'
+      uses: aws-actions/configure-aws-credentials@v6
+      with:
+        aws-region: ${{ inputs.aws-region }}
+        role-to-assume: ${{ inputs.aws-role-arn }}
+
+    - id: login-ecr
+      name: Log in to ECR
+      if: steps.prepare.outputs.registry == 'ecr'
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Log in to GHCR
+      if: steps.prepare.outputs.registry == 'ghcr'
+      uses: docker/login-action@v4
+      with:
+        password: ${{ inputs.token }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+
+    - id: preflight
+      name: Pre-flight registry repository and version
+      shell: bash
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        INPUT_IMAGE: ${{ inputs.image }}
+        INPUT_REPOSITORY_PREFIX: ${{ inputs.repository-prefix }}
+        INPUT_VERSION: ${{ inputs.version }}
+        OWNER: ${{ github.repository_owner }}
+        REGISTRY: ${{ steps.prepare.outputs.registry }}
+      run: ${{ github.action_path }}/publish-image.sh preflight
+
+    - uses: docker/setup-qemu-action@v3
+
+    - uses: docker/setup-buildx-action@v3
+
+    - uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ steps.prepare.outputs.dockerfile }}
+        platforms: ${{ steps.prepare.outputs.platforms }}
+        push: true
+        # Mounted as the BuildKit secret `source_token` only when the caller
+        # passes source-token; empty means no secret is passed.
+        secrets: ${{ inputs.source-token != '' && format('source_token={0}', inputs.source-token) || '' }}
+        tags: |
+          ${{ steps.preflight.outputs.image_ref }}:${{ inputs.version }}
+          ${{ steps.preflight.outputs.image_ref }}:latest
+          ${{ steps.preflight.outputs.image_ref }}:${{ github.sha }}
+
+    # GITHUB_SHA, which release and summary read, is the runner's default env.
+    - name: Create tag and GitHub Release
+      shell: bash
+      env:
+        CONFIG: ${{ steps.prepare.outputs.config }}
+        GH_TOKEN: ${{ inputs.token }}
+        INPUT_FIRST_PUBLISH_NOTES_LIMIT: ${{ inputs.first-publish-notes-limit }}
+        INPUT_IMAGE: ${{ inputs.image }}
+        INPUT_IMAGES_ROOT: ${{ inputs.images-root }}
+        INPUT_PREVIOUS_VERSION: ${{ inputs.previous-version }}
+        INPUT_REPOSITORY_PREFIX: ${{ inputs.repository-prefix }}
+        INPUT_VERSION: ${{ inputs.version }}
+        RELEASE_TAG: ${{ steps.prepare.outputs.release_tag }}
+      run: ${{ github.action_path }}/publish-image.sh release
+
+    - name: Publish summary
+      shell: bash
+      env:
+        FIRST_PUBLISH: ${{ steps.prepare.outputs.first_publish }}
+        IMAGE_REF: ${{ steps.preflight.outputs.image_ref }}
+        INPUT_IMAGE: ${{ inputs.image }}
+        INPUT_PREVIOUS_VERSION: ${{ inputs.previous-version }}
+        INPUT_REPOSITORY_PREFIX: ${{ inputs.repository-prefix }}
+        INPUT_VERSION: ${{ inputs.version }}
+        PLATFORMS: ${{ steps.prepare.outputs.platforms }}
+        REGISTRY: ${{ steps.prepare.outputs.registry }}
+        RELEASE_TAG: ${{ steps.prepare.outputs.release_tag }}
+      run: ${{ github.action_path }}/publish-image.sh summary
