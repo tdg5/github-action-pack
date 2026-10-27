@@ -3,7 +3,8 @@
 
 The YAML validator only parses action.yaml; this asserts its content: the
 input contract, the subcommand wiring, the pinned third-party steps and
-their order, and that the source token reaches only build-push's secrets.
+their order, that the source token reaches only build-push's secrets, and
+that build-args passes through to build-push.
 """
 
 import os
@@ -19,6 +20,7 @@ EXPECTED_INPUTS = {
     # name: (required, default); None means no default key.
     "aws-region": (False, "us-east-1"),
     "aws-role-arn": (False, ""),
+    "build-args": (False, ""),
     "context": (False, "."),
     "default-build-config": (False, ""),
     "first-publish-notes-limit": (False, ""),
@@ -168,7 +170,10 @@ def main():
         secrets = str(with_.get("secrets", ""))
         check("inputs.source-token" in secrets, "build-push secrets must reference inputs.source-token")
         check("source_token" in secrets.replace("inputs.source-token", ""), "build-push secrets must use the id source_token")
-        check("build-args" not in with_, "build-push must have no build-args")
+        check(
+            with_.get("build-args") == "${{ inputs.build-args }}",
+            "build-push build-args must be ${{ inputs.build-args }}",
+        )
 
     check("secrets." not in text, "the text 'secrets.' must not appear in action.yaml")
 
