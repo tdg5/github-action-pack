@@ -44,6 +44,7 @@ Before building, it refuses to publish when:
 |---|---|---|---|
 | `aws-region` | no | `us-east-1` | Region of the ECR registry. |
 | `aws-role-arn` | no (required for ECR) | `''` | Role assumed via GitHub OIDC. |
+| `build-args` | no | `''` | Newline-separated `KEY=value` build arguments; not secrets (use `source-token`). |
 | `context` | no | `.` | Docker build context. |
 | `default-build-config` | no | `''` | Build config used when the image has no `build-config.yaml`. |
 | `first-publish-notes-limit` | no | `''` | Caps a first publish's notes at this many commits; empty is no cap. |

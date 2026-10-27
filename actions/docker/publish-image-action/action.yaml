@@ -18,6 +18,10 @@ inputs:
     description: 'IAM role to assume via GitHub OIDC. Required when the image''s build config says registry: ecr.'
     required: false
     default: ''
+  build-args:
+    description: 'Newline-separated KEY=value build arguments passed to the build. They are not secrets: build args are visible in the image history, so pass a secret through source-token instead.'
+    required: false
+    default: ''
   context:
     description: 'Docker build context, relative to the checkout root.'
     required: false
@@ -115,6 +119,7 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ steps.prepare.outputs.dockerfile }}
         platforms: ${{ steps.prepare.outputs.platforms }}
+        build-args: ${{ inputs.build-args }}
         push: true
         # Mounted as the BuildKit secret `source_token` only when the caller
         # passes source-token; empty means no secret is passed.
